@@ -130,8 +130,8 @@
 			</el-table>
 		</div>
 		<div class="block">
-			<el-pagination class="pagination-container" @size-change="handlePageChange"
-				@current-change="handlePageChange" :current-page="pageData.page" :page-sizes="pageData.pageSizes"
+			<el-pagination class="pagination-container" @size-change="handleSizeChange"
+				@current-change="handleCurrentChange" :current-page="pageData.page" :page-sizes="pageData.pageSizes"
 				:page-size="pageData.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="pageData.total">
 			</el-pagination>
 		</div>
@@ -201,8 +201,17 @@ export default {
 			this.itemDetails = row
 			this.dialogVisible = true
 		},
+		handleSizeChange(val) {
+			this.pageData.pageSize = val
+			this.handlePageChange()
+		},
+		handleCurrentChange(val) {
+			this.pageData.page = val
+			this.handlePageChange()
+		},
 		handlePageChange() {
 			let url = this.getPageUrl()
+			alert(url)
 			axios({
 				method: 'get',
 				url: url,
@@ -270,13 +279,7 @@ export default {
 				}
 			});
 		}
-	},
-  created() {
-    getItems().then((res) => {
-      console.log(res);
-      this.itemData = res;
-    })
-  }
+	}
 }
 </script>
 

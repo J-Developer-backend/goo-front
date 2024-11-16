@@ -2,7 +2,35 @@ import axios from 'axios'
 export const HOST = '/api'
 
 export const ERR_OK = 200;
+/**
+ * 获取所有订单
+ * @param {string} status - 订单状态，可选参数
+ * @returns {Promise} - 返回包含订单列表的 Promise
+ */
+export function getAllOrders(status) {
+    const url = `${HOST}/orders`;
+    return axios.get(url, { params: { status } });
+}
 
+/**
+ * 取消订单
+ * @param {number} orderId - 订单 ID
+ * @returns {Promise} - 返回取消结果的 Promise
+ */
+export function cancelOrder(orderId) {
+    const url = `${HOST}/orders/cancel`;
+    return axios.put(url, { orderId });
+}
+
+/**
+ * 确认订单完成
+ * @param {number} orderId - 订单 ID
+ * @returns {Promise} - 返回确认结果的 Promise
+ */
+export function finishOrder(orderId) {
+    const url = `${HOST}/orders/finish`;
+    return axios.put(url, { orderId });
+}
 /**
  * 获取商品详情
  * @param {number} itemId - 商品ID

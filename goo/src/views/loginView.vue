@@ -1,19 +1,25 @@
 <template>
-  <div>
-    <el-form ref="form" :model="form" label-width="80px">
-      <el-form-item label="用户名">
-        <el-input v-model="form.username"></el-input>
-      </el-form-item>
-      <el-form-item label="密码">
-        <el-input v-model="form.password" show-password></el-input>
-      </el-form-item>
-    </el-form>
-    <el-button type="primary" @click="handleLogin">登录</el-button>
+  <div class="login-container">
+    <div class="login-form">
+      <h2>登录</h2>
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="用户名">
+          <el-input v-model="form.username" placeholder="请输入用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input v-model="form.password" placeholder="请输入密码" show-password></el-input>
+        </el-form-item>
+      </el-form>
+      <div class="form-actions">
+        <el-button type="primary" @click="handleLogin">登录</el-button>
+        <el-button type="text" @click="goToRegister">注册</el-button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { login } from "@/api/api"; // 引入封装的 API
+import {login} from "@/api/api"; // 引入封装的 API
 import {jwtDecode} from "jwt-decode";
 
 export default {
@@ -64,11 +70,52 @@ export default {
         console.error("登录失败：", error);
         this.$message.error("登录失败，请检查网络或稍后重试！");
       }
+    },
+    goToRegister() {
+      this.$router.push("/register"); // 跳转到注册页面
     }
   }
 };
 </script>
 
 <style>
-/* 样式部分根据需要定制 */
+/* 页面容器样式 */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* 登录表单样式 */
+.login-form {
+  width: 400px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.login-form h2 {
+  margin-bottom: 20px;
+  color: #333333;
+  font-weight: bold;
+}
+
+/* 按钮组样式 */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.el-button {
+  width: 45%;
+}
+
+.el-input {
+  width: 100%;
+}
 </style>

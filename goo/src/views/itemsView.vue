@@ -57,7 +57,7 @@
 				</el-col>
 				<el-col :span="4">
 					<div class="grid-content bg-purple-light">
-						<el-button type="primary" @click="handSearch">搜索</el-button>
+						<el-button type="primary" @click="handleSearch">搜索</el-button>
 					</div>
 				</el-col>
 			</el-row>
@@ -88,23 +88,23 @@
 				</el-table-column>
 				<el-table-column label="操作">
 					<template slot-scope="scope">
-						<el-button size="mini" type="success" @click="handleDetail(scope.$index, scope.row)">
+						<el-button size="mini" type="success" @click="handleDetail(scope.row)">
 							详情
 						</el-button>
 						<el-dialog title="商品详情" :visible.sync="dialogVisible" width="30%" center>
 							<span>
 								<el-descriptions title="商品信息">
-									<el-descriptions-item label="商品名称">{{ scope.row.name }}</el-descriptions-item>
-									<el-descriptions-item label="价格">{{ scope.row.price }}</el-descriptions-item>
+									<el-descriptions-item label="商品名称">{{ itemDetails.name }}</el-descriptions-item>
+									<el-descriptions-item label="价格">{{ itemDetails.price }}</el-descriptions-item>
 									<el-descriptions-item label="分类">
-										<el-tag size="small">{{ scope.row.categoryName }}</el-tag>
+										<el-tag size="small">{{ itemDetails.categoryName }}</el-tag>
 									</el-descriptions-item>
-									<el-descriptions-item label="卖方">{{ scope.row.username }}</el-descriptions-item>
-									<el-descriptions-item label="联系地址">{{ scope.row.location }}</el-descriptions-item>
-									<el-descriptions-item label="介绍">{{ scope.row.description }}</el-descriptions-item>
+									<el-descriptions-item label="卖方">{{ itemDetails.username }}</el-descriptions-item>
+									<el-descriptions-item label="联系地址">{{ itemDetails.location }}</el-descriptions-item>
+									<el-descriptions-item label="介绍">{{ itemDetails.description }}</el-descriptions-item>
 									<el-descriptions-item label="图片">
-										<template slot-scope="scope">
-											<img :src="scope.row.image" alt="Image" style="width: 100px; height: auto;">
+										<template>
+											<img :src="itemDetails.image" alt="Image" style="width: 100px; height: auto;">
 										</template>
 									</el-descriptions-item>
 								</el-descriptions>
@@ -130,8 +130,8 @@
 			</el-table>
 		</div>
 		<div class="block">
-			<el-pagination class="pagination-container" @size-change="handlePageChange"
-				@current-change="handlePageChange" :current-page="pageData.page" :page-sizes="pageData.pageSizes"
+			<el-pagination class="pagination-container" @size-change="handleSizeChange"
+				@current-change="handleCurrentChange" :current-page="pageData.page" :page-sizes="pageData.pageSizes"
 				:page-size="pageData.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="pageData.total">
 			</el-pagination>
 		</div>
@@ -159,9 +159,9 @@ export default {
 			dialogVisible: false,
 			dialogFormVisible: false,
 			pageData: {
-				total: "0",
-				page: "1",
-				pageSize: "10",
+				total: 0,
+				page: 1,
+				pageSize: 10,
 				pageSizes: [10, 20, 30, 40]
 			},
 			orderForm: {
@@ -197,9 +197,27 @@ export default {
 	},
 	methods: {
 		// 商品详情
-		handleDetail(index, row) {
-			this.itemDetails = row
-			this.dialogVisible = true
+		handleDetail(row) {
+			let url = '/api/item/' + row.id
+			axios({
+				method: 'get',
+				url: url,
+				headers: {
+					// TODO add token
+					token: ''
+				}
+			}).then(res => {
+				this.itemDetails = res.data.data
+				this.dialogVisible = true
+			});
+		},
+		handleSizeChange(val) {
+			this.pageData.pageSize = val
+			this.handlePageChange()
+		},
+		handleCurrentChange(val) {
+			this.pageData.page = val
+			this.handlePageChange()
 		},
 		handlePageChange() {
 			let url = this.getPageUrl()
@@ -235,7 +253,7 @@ export default {
 			}
 			return url
 		},
-		handSearch() {
+		handleSearch() {
 			this.handlePageChange()
 			this.searchData.searchName = ''
 			this.searchData.searchCategory = ''
@@ -270,13 +288,7 @@ export default {
 				}
 			});
 		}
-	},
-  created() {
-    getItems().then((res) => {
-      console.log(res);
-      this.itemData = res;
-    })
-  }
+	}
 }
 </script>
 

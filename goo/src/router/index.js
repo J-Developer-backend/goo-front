@@ -18,11 +18,6 @@ const routes = [
     redirect: '/home/welcome',
     children: [
       {
-        path: '/home/addItem',
-        name: 'AddItem',
-        component: () => import('@/views/AddItem.vue'),
-      },
-      {
         path: '/home/items',
         component: () => import("@/views/itemsView.vue")
       },
@@ -49,6 +44,10 @@ const routes = [
       {
         path: '/home/register',
         component: () => import("@/views/registerView.vue")
+      },
+      {
+        path: '/home/myItem',
+        component: () => import("@/views/myItemView.vue")
       },
     ]
   }

@@ -17,7 +17,7 @@
       </el-table-column>
       <el-table-column label="操作">
         <template #default="scope">
-          <!-- 0状态：下单等待支付，可以取消 -->
+          <!-- 0状态：下单等待支付，可以取消或付款 -->
           <el-button
               v-if="scope.row.status === 0"
               size="mini"
@@ -25,6 +25,14 @@
               @click="handleCancelOrder(scope.row.id)"
           >
             取消订单
+          </el-button>
+          <el-button
+              v-if="scope.row.status === 0"
+              size="mini"
+              type="success"
+              @click="handlePayOrder(scope.row.id)"
+          >
+            付款
           </el-button>
           <!-- 1状态：已支付，可以确认签收 -->
           <el-button
@@ -68,7 +76,7 @@
 </template>
 
 <script>
-import { getAllOrders, cancelOrder, finishOrder, getItemDetails } from "@/api/api";
+import { getAllOrders, cancelOrder, finishOrder, getItemDetails, payOrder } from "@/api/api";
 
 export default {
   data() {
@@ -152,6 +160,21 @@ export default {
       } catch (error) {
         console.error("获取商品详情失败：", error);
         this.$message.error("请求商品详情时出现错误，请稍后重试！");
+      }
+    },
+    // 付款订单
+    async handlePayOrder(orderId) {
+      try {
+        const response = await payOrder(orderId, { responseType: 'text' }); // 调用付款接口，指定返回类型为纯文本
+        // 直接打开返回的页面内容
+        const newWindow = window.open("", "_blank"); // 打开新窗口
+        newWindow.document.open();
+        newWindow.document.write(response.data); // 将返回的页面 HTML 写入新窗口
+        newWindow.document.close();
+        this.$message.success("正在跳转到支付页面...");
+      } catch (error) {
+        console.error("付款失败：", error);
+        this.$message.error("付款时出现错误，请稍后重试！");
       }
     },
   },

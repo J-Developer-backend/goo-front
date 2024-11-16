@@ -2,6 +2,16 @@ import axios from 'axios'
 export const HOST = '/api'
 
 export const ERR_OK = 200;
+
+export function payOrder(orderId) {
+    const url = `${HOST}/pay/${orderId}`;
+    return axios.get(url, {
+        headers: {
+            // 根据实际情况添加必要的认证信息
+            'Content-Type': 'application/json',
+        },
+    });
+}
 /**
  * 获取所有订单
  * @param {string} status - 订单状态，可选参数

@@ -3,6 +3,31 @@ export const HOST = '/api'
 
 export const ERR_OK = 200;
 
+/**
+ * 上传图片
+ * @param {File} file - 上传的文件对象
+ * @returns {Promise} - 返回包含上传结果的 Promise
+ */
+export function uploadImage(file) {
+    const url = HOST + '/upload';
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return axios.post(url, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+}
+
+/**
+ * 提交商品表单
+ * @param {Object} payload - 商品数据
+ * @returns {Promise} - 返回包含提交结果的 Promise
+ */
+export function submitItem(payload) {
+    const url = HOST + '/item';
+    return axios.post(url, payload);
+}
+
 export function login(username, password) {
     const url = HOST + '/users/login';
     return axios.post(url, { username, password });

@@ -18,6 +18,11 @@ const routes = [
     redirect: '/home/welcome',
     children: [
       {
+        path: '/home/addItem',
+        name: 'AddItem',
+        component: () => import('@/views/AddItem.vue'),
+      },
+      {
         path: '/home/items',
         component: () => import("@/views/itemsView.vue")
       },

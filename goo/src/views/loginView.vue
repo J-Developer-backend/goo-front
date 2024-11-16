@@ -1,121 +1,84 @@
 <template>
-  <div class="login-container">
-    <div class="login-form">
-      <h2>登录</h2>
-      <el-form ref="form" :model="form" label-width="80px">
-        <el-form-item label="用户名">
-          <el-input v-model="form.username" placeholder="请输入用户名"></el-input>
-        </el-form-item>
-        <el-form-item label="密码">
-          <el-input v-model="form.password" placeholder="请输入密码" show-password></el-input>
-        </el-form-item>
-      </el-form>
-      <div class="form-actions">
-        <el-button type="primary" @click="handleLogin">登录</el-button>
-        <el-button type="text" @click="goToRegister">注册</el-button>
-      </div>
-    </div>
+  <div class="favorite-container">
+    <h2>我的收藏</h2>
+    <el-table :data="favorites" border style="width: 100%" @row-click="goToItemDetails">
+      <el-table-column prop="name" label="商品名称" width="150" />
+      <el-table-column prop="description" label="描述" />
+      <el-table-column prop="price" label="价格" />
+      <el-table-column prop="location" label="位置" />
+      <el-table-column label="图片">
+        <template #default="scope">
+          <img :src="scope.row.image" alt="商品图片" class="item-image" />
+        </template>
+      </el-table-column>
+      <el-table-column prop="username" label="用户名" />
+    </el-table>
+    <el-pagination
+        background
+        layout="prev, pager, next"
+        :total="total"
+        :page-size="perSize"
+        :current-page="page"
+        @current-change="handlePageChange"
+    />
   </div>
 </template>
 
 <script>
-import {login} from "@/api/api"; // 引入封装的 API
-import {jwtDecode} from "jwt-decode";
+import {getFavorites} from "@/api/api";
 
 export default {
   data() {
     return {
-      form: {
-        username: "", // 用户名
-        password: ""  // 密码
-      }
+      page: 1, // 当前页
+      perSize: 10, // 每页条数
+      favorites: [], // 收藏数据
+      total: 0, // 总记录数
     };
   },
+  mounted() {
+    this.fetchFavorites(); // 页面加载时请求数据
+  },
   methods: {
-    async handleLogin() {
-      // 表单验证
-      if (!this.form.username || !this.form.password) {
-        this.$message.error("用户名和密码不能为空！");
-        return;
-      }
-
+    // 获取收藏数据
+    async fetchFavorites() {
       try {
-        // 调用登录接口
-        const response = await login(this.form.username, this.form.password);
-
-        // 检查响应中的 code
+        const response = await getFavorites(this.page, this.perSize);
         if (response.data.code === 200) {
-          const token = response.data.data.token; // 获取 token
-
-          // 存储 JWT 到本地
-          localStorage.setItem("jwt", token);
-
-          // 解析 JWT 获取用户信息
-          console.log(jwtDecode(token));
-
-          const userInfo = jwtDecode(token);
-
-          // 存储用户信息到本地
-          localStorage.setItem("user", JSON.stringify(userInfo));
-
-          // 提示用户登录成功并跳转
-          this.$message.success(response.data.msg || "登录成功！");
-          await this.$router.push("/");
+          this.favorites = response.data.data.record; // 解析 record 数据
+          this.total = response.data.data.total; // 获取总记录数
         } else {
-          // code 不为 200 时，提示错误信息
-          this.$message.error(response.data.msg || "登录失败！");
+          this.$message.error("获取收藏数据失败：" + (response.data.msg || "未知错误"));
         }
       } catch (error) {
-        // 捕获异常，提示错误信息
-        console.error("登录失败：", error);
-        this.$message.error("登录失败，请检查网络或稍后重试！");
+        console.error("获取收藏数据失败：", error);
+        this.$message.error("请求收藏数据时出现错误，请稍后重试！");
       }
     },
-    goToRegister() {
-      this.$router.push("/register"); // 跳转到注册页面
-    }
-  }
+    // 页码变更时触发
+    handlePageChange(newPage) {
+      this.page = newPage;
+      this.fetchFavorites();
+    },
+    // 跳转到商品详情页面
+    goToItemDetails(row) {
+      this.$router.push({path: `/item/${row.id}`});
+    },
+  },
 };
 </script>
 
 <style>
-/* 页面容器样式 */
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f5f5f5;
-}
-
-/* 登录表单样式 */
-.login-form {
-  width: 400px;
+.favorite-container {
   padding: 20px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  background-color: #f5f5f5;
+  min-height: 100vh;
 }
 
-.login-form h2 {
-  margin-bottom: 20px;
-  color: #333333;
-  font-weight: bold;
-}
-
-/* 按钮组样式 */
-.form-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-.el-button {
-  width: 45%;
-}
-
-.el-input {
-  width: 100%;
+.item-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
 }
 </style>

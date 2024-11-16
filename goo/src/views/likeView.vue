@@ -1,7 +1,7 @@
 <template>
   <div class="favorite-container">
     <h2>我的收藏</h2>
-    <el-table :data="favorites" border style="width: 100%">
+    <el-table :data="favorites" border style="width: 100%" @row-click="goToItemDetails">
       <el-table-column prop="name" label="商品名称" width="150" />
       <el-table-column prop="description" label="描述" />
       <el-table-column prop="price" label="价格" />
@@ -59,6 +59,10 @@ export default {
     handlePageChange(newPage) {
       this.page = newPage;
       this.fetchFavorites();
+    },
+    // 跳转到商品详情页面
+    goToItemDetails(row) {
+      this.$router.push({ path: `/home/details/${row.id}` });
     },
   },
 };

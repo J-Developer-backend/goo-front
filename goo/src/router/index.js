@@ -35,7 +35,7 @@ const routes = [
         component: () => import("@/views/messageView.vue")
       },
       {
-        path: '/home/details',
+        path: '/home/details/:itemId',
         component: () => import("@/views/detailsView.vue")
       },
       {

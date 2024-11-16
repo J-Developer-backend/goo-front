@@ -4,6 +4,16 @@ export const HOST = '/api'
 export const ERR_OK = 200;
 
 /**
+ * 获取商品详情
+ * @param {number} itemId - 商品ID
+ * @returns {Promise} - 返回商品详情的 Promise
+ */
+export function getItemDetails(itemId) {
+    const url = `${HOST}/item/${itemId}`;
+    return axios.get(url);
+}
+
+/**
  * 获取收藏数据
  * @param {number} page - 页码
  * @param {number} perSize - 每页条数

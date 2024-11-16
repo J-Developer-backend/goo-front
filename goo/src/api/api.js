@@ -3,6 +3,29 @@ export const HOST = '/api'
 
 export const ERR_OK = 200;
 
+// 获取个人信息
+export function getUserProfile() {
+    return axios.get(`${HOST}/users`);
+}
+
+// 更新数据
+export function update(avatar, creatTime, email, phoneNumber, sex, username) {
+    const params = new URLSearchParams();
+    if (avatar) params.append("avatar", avatar);
+    if (creatTime) params.append("creatTime", creatTime);
+    if (email) params.append("email", email);
+    if (phoneNumber) params.append("phoneNumber", phoneNumber);
+    if (sex) params.append("sex", sex);
+    if (username) params.append("username", username);
+
+    return axios.put(`${HOST}/users/update?${params.toString()}`);
+}
+
+// 重置密码
+export function resetPassword(data) {
+    return axios.put(`${HOST}/users/resetPassword`, data);
+}
+
 export function payOrder(orderId) {
     const url = `${HOST}/pay/${orderId}`;
     return axios.get(url, {

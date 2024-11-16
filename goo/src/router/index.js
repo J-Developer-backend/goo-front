@@ -13,10 +13,15 @@ const routes = [
     component: () => import("@/views/registerView.vue")
   },
   {
-    path: '/home',
+    path: '/',
     component: () => import("@/views/homeView.vue"),
     redirect: '/home/welcome',
     children: [
+      {
+        path: '/home/addItem',
+        name: 'AddItem',
+        component: () => import('@/views/AddItem.vue'),
+      },
       {
         path: '/home/items',
         component: () => import("@/views/itemsView.vue")
@@ -30,7 +35,7 @@ const routes = [
         component: () => import("@/views/messageView.vue")
       },
       {
-        path: '/home/details',
+        path: '/home/details/:itemId',
         component: () => import("@/views/detailsView.vue")
       },
       {

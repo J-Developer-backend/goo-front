@@ -1,6 +1,7 @@
 <template>
 
 	<div>
+    <HeaderBanner />
 		<el-container style="height: 100vh;">
 			<el-aside width="200px">
 				<el-row class="tac">
@@ -11,6 +12,10 @@
 								<i class="el-icon-menu"></i>
 								<span slot="title">商品首页</span>
 							</el-menu-item>
+              <el-menu-item index="/home/addItem">
+                <i class="el-icon-menu"></i>
+                <span slot="title">发布新商品</span>
+              </el-menu-item>
 							<el-menu-item index="order">
 								<i class="el-icon-menu"></i>
 								<span slot="title">我的订单</span>
@@ -41,8 +46,12 @@
 </template>
 
 <script>
+import HeaderBanner from '@/components/HeaderBanner.vue';
 
 export default {
+  components: {
+    HeaderBanner
+  }
 }
 </script>
 

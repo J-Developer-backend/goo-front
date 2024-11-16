@@ -270,7 +270,13 @@ export default {
 				}
 			});
 		}
-	}
+	},
+  created() {
+    getItems().then((res) => {
+      console.log(res);
+      this.itemData = res;
+    })
+  }
 }
 </script>
 

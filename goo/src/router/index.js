@@ -13,7 +13,7 @@ const routes = [
     component: () => import("@/views/registerView.vue")
   },
   {
-    path: '/home',
+    path: '/',
     component: () => import("@/views/homeView.vue"),
     redirect: '/home/welcome',
     children: [

@@ -67,6 +67,8 @@
 </template>
 
 <script>
+import {getItems} from "@/api/api";
+
 export default {
 	data() {
 		return {
@@ -117,7 +119,13 @@ export default {
 		handleDelete(index, row) {
 			console.log(index, row);
 		}
-	}
+	},
+  created() {
+    getItems().then((res) => {
+      console.log(res);
+      this.itemData = res;
+    })
+  }
 }
 </script>
 

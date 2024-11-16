@@ -1,6 +1,7 @@
 <template>
 
 	<div>
+    <HeaderBanner />
 		<el-container style="height: 100vh;">
 			<el-aside width="200px">
 				<el-row class="tac">
@@ -41,8 +42,12 @@
 </template>
 
 <script>
+import HeaderBanner from '@/components/HeaderBanner.vue';
 
 export default {
+  components: {
+    HeaderBanner
+  }
 }
 </script>
 

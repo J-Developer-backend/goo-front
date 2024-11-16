@@ -4,6 +4,22 @@ export const HOST = '/api'
 export const ERR_OK = 200;
 
 /**
+ * 获取收藏数据
+ * @param {number} page - 页码
+ * @param {number} perSize - 每页条数
+ * @returns {Promise} - 返回包含收藏数据的 Promise
+ */
+export function getFavorites(page, perSize) {
+    const url = HOST + '/favorite';
+    return axios.get(url, {
+        params: {
+            page,
+            perSize
+        }
+    });
+}
+
+/**
  * 上传图片
  * @param {File} file - 上传的文件对象
  * @returns {Promise} - 返回包含上传结果的 Promise

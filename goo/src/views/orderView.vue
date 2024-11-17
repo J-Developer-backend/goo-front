@@ -1,77 +1,83 @@
 <template>
-  <div class="order-container">
-    <h2>我的订单</h2>
-    <el-table :data="orders" border style="width: 100%">
-      <el-table-column prop="itemName" label="商品名称" />
-      <el-table-column prop="number" label="数量" />
-      <el-table-column prop="price" label="价格" />
-      <el-table-column prop="sellUser" label="卖家" />
-      <el-table-column prop="createTime" label="下单时间" />
-      <el-table-column prop="status" label="状态">
-        <!-- 根据状态值显示对应的状态文字 -->
-        <template #default="scope">
-          <span>
-            {{ getStatusText(scope.row.status) }}
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作">
-        <template #default="scope">
-          <!-- 0状态：下单等待支付，可以取消或付款 -->
-          <el-button
-              v-if="scope.row.status === 0"
-              size="mini"
-              type="danger"
-              @click="handleCancelOrder(scope.row.id)"
-          >
-            取消订单
-          </el-button>
-          <el-button
-              v-if="scope.row.status === 0"
-              size="mini"
-              type="success"
-              @click="handlePayOrder(scope.row.id)"
-          >
-            付款
-          </el-button>
-          <!-- 1状态：已支付，可以确认签收 -->
-          <el-button
-              v-if="scope.row.status === 1"
-              size="mini"
-              type="primary"
-              @click="handleFinishOrder(scope.row.id)"
-          >
-            确认收货
-          </el-button>
-          <!-- 查看商品详情 -->
-          <el-button
-              size="mini"
-              type="info"
-              @click="handleItemDetails(scope.row.itemId)"
-          >
-            查看商品
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+  <div>
+    <div>
+      <el-row :gutter="20">
+        <el-col :span="6">
+          <div>
+            <el-select style="width: 200px;" v-model="searchData.status" placeholder="状态">
+              <el-option v-for="s in searchData.statuses" :key="s" :value="s.id" :label="s.status">
+              </el-option>
+            </el-select>
+          </div>
+        </el-col>
+        <el-col :span="6">
+          <div>
+            <el-button style="float: left; margin-left: 50px; width: 150px;" type="primary" @click="handleSearch">搜 索</el-button>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+    <div class="order-container">
+      <h2>我的订单</h2>
+      <el-table :data="orders" border style="width: 100%">
+        <el-table-column prop="itemName" label="商品名称" width="120" />
+        <el-table-column prop="number" label="订单号" width="150" />
+        <el-table-column prop="price" label="价格" width="120" />
+        <el-table-column prop="sellUser" label="卖家" width="120" />
+        <el-table-column prop="creatTime" label="下单时间" width="180" />
+        <el-table-column prop="status" label="状态" width="200">
+          <!-- 根据状态值显示对应的状态文字 -->
+          <template #default="scope">
+            <span>
+              {{ getStatusText(scope.row.status) }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template #default="scope">
+            <!-- 0状态：下单等待支付，可以取消或付款 -->
+            <el-button v-if="scope.row.status === 0" size="mini" type="danger" @click="handleCancelOrder(scope.row.id)">
+              取消订单
+            </el-button>
+            <el-button v-if="scope.row.status === 0" size="mini" type="success" @click="handlePayOrder(scope.row.id)">
+              付款
+            </el-button>
+            <!-- 1状态：已支付，可以确认签收 -->
+            <el-button v-if="scope.row.status === 1" size="mini" type="primary"
+              @click="handleFinishOrder(scope.row.id)">
+              确认收货
+            </el-button>
+            <!-- 查看商品详情 -->
+            <el-button size="mini" type="info" @click="handleItemDetails(scope.row.itemId)">
+              查看商品
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
-    <!-- 商品详情弹出框 -->
-    <el-dialog title="商品详情" :visible.sync="dialogVisible" width="40%">
-      <el-descriptions title="商品信息" border>
-        <el-descriptions-item label="商品名称">{{ itemDetails.name }}</el-descriptions-item>
-        <el-descriptions-item label="价格">{{ itemDetails.price }}</el-descriptions-item>
-        <el-descriptions-item label="分类">{{ itemDetails.categoryName }}</el-descriptions-item>
-        <el-descriptions-item label="卖方">{{ itemDetails.username }}</el-descriptions-item>
-        <el-descriptions-item label="货源地">{{ itemDetails.location }}</el-descriptions-item>
-        <el-descriptions-item label="描述">{{ itemDetails.description }}</el-descriptions-item>
-        <el-descriptions-item label="图片">
-          <img :src="itemDetails.image" alt="商品图片" class="item-details-image" />
-        </el-descriptions-item>
-      </el-descriptions>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">关闭</el-button>
-      </span>
-    </el-dialog>
+      <!-- 商品详情弹出框 -->
+      <el-dialog title="商品详情" :visible.sync="dialogVisible" width="40%">
+        <el-descriptions title="商品信息" border>
+          <el-descriptions-item label="商品名称">{{ itemDetails.name }}</el-descriptions-item>
+          <el-descriptions-item label="价格">{{ itemDetails.price }}</el-descriptions-item>
+          <el-descriptions-item label="分类">{{ itemDetails.categoryName }}</el-descriptions-item>
+          <el-descriptions-item label="卖方">{{ itemDetails.username }}</el-descriptions-item>
+          <el-descriptions-item label="货源地">{{ itemDetails.location }}</el-descriptions-item>
+          <el-descriptions-item label="描述">{{ itemDetails.description }}</el-descriptions-item>
+          <el-descriptions-item label="图片">
+            <img :src="itemDetails.image" alt="商品图片" class="item-details-image" />
+          </el-descriptions-item>
+        </el-descriptions>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible = false">关闭</el-button>
+        </span>
+      </el-dialog>
+    </div>
+    <div>
+      <el-pagination background layout="prev, pager, next" :total="total" :current-page="page"
+        @current-change="handleCurrentChange">
+      </el-pagination>
+    </div>
   </div>
 </template>
 
@@ -84,6 +90,17 @@ export default {
       orders: [], // 存储订单数据
       dialogVisible: false, // 商品详情弹框可见性
       itemDetails: {}, // 当前选中的商品详情数据
+      total: 0,
+      page: 1,
+      searchData: {
+        status: 0,
+        statuses: [
+          { id: 0, status: '下单等待支付' },
+          { id: 1, status: '已支付' },
+          { id: 2, status: '已完成' },
+          { id: 3, status: '已取消' }
+        ]
+      },
     };
   },
   mounted() {
@@ -93,9 +110,10 @@ export default {
     // 获取所有订单
     async fetchOrders() {
       try {
-        const response = await getAllOrders();
+        const response = await getAllOrders(this.page, this.searchData.status);
         if (response.data.code === 200) {
-          this.orders = response.data.data; // 设置订单数据
+          this.orders = response.data.data.record; // 设置订单数据
+          this.total = parseInt((parseInt(response.data.data.total) + 10) / 10) // 后端设定页面大小为十
         } else {
           this.$message.error("获取订单失败：" + (response.data.msg || "未知错误"));
         }
@@ -113,6 +131,8 @@ export default {
           return "已支付";
         case 2:
           return "已完成";
+        case 3:
+          return "已取消"
         default:
           return "未知状态";
       }
@@ -177,6 +197,13 @@ export default {
         this.$message.error("付款时出现错误，请稍后重试！");
       }
     },
+    // 页号改变
+    handleCurrentChange() {
+      this.fetchOrders()
+    },
+    handleSearch() {
+      this.fetchOrders()
+    }
   },
 };
 </script>
@@ -184,7 +211,7 @@ export default {
 <style>
 .order-container {
   padding: 20px;
-  background-color: #f5f5f5;
+  background-color: #ffffff;
   min-height: 100vh;
 }
 

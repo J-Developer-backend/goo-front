@@ -161,7 +161,7 @@ export default {
 <style>
 .profile-container {
   padding: 20px;
-  background-color: #f5f5f5;
+  background-color: #ffffff;
   min-height: 100vh;
 }
 

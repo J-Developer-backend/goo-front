@@ -88,9 +88,8 @@
 				</el-table-column>
 				<el-table-column label="操作">
 					<template slot-scope="scope">
-						<el-button size="mini" type="success" @click="handleDetail(scope.row)">
-							详情
-						</el-button>
+						<el-button size="mini" type="success" @click="handleDetail(scope.row)">详 情</el-button>
+						<el-button size="mini" @click="handlePreOrder(scope.row)" type="danger">下 单</el-button>
 						<el-dialog title="商品详情" :visible.sync="dialogVisible" width="30%" center>
 							<span>
 								<el-descriptions title="商品信息">
@@ -101,29 +100,29 @@
 									</el-descriptions-item>
 									<el-descriptions-item label="卖方">{{ itemDetails.username }}</el-descriptions-item>
 									<el-descriptions-item label="联系地址">{{ itemDetails.location }}</el-descriptions-item>
-									<el-descriptions-item label="介绍">{{ itemDetails.description }}</el-descriptions-item>
+									<el-descriptions-item label="介绍">{{ itemDetails.description
+										}}</el-descriptions-item>
 									<el-descriptions-item label="图片">
 										<template>
-											<img :src="itemDetails.image" alt="Image" style="width: 100px; height: auto;">
+											<img :src="itemDetails.image" alt="Image" style="width: 80%; height: auto;">
 										</template>
 									</el-descriptions-item>
 								</el-descriptions>
 							</span>
 							<span slot="footer" class="dialog-footer">
-								<el-button @click="dialogFormVisible = true" type="danger">下 单</el-button>
-								<el-dialog title="收货地址" :visible.sync="dialogFormVisible">
-									<el-form :model="orderForm">
-										<el-form-item label="地址" :label-width="formLabelWidth">
-											<el-input v-model="orderForm.target"></el-input>
-										</el-form-item>
-									</el-form>
-									<div slot="footer" class="dialog-footer">
-										<el-button @click="dialogFormVisible = false">取 消</el-button>
-										<el-button type="primary" @click="handleOrder">下 单</el-button>
-									</div>
-								</el-dialog>
-								<el-button @click="dialogVisible = false" type="primary">确 定</el-button>
+								<el-button @click="dialogVisible = false" type="primary" style="margin-left: 50px;">确 定</el-button>
 							</span>
+						</el-dialog>
+						<el-dialog title="收货地址" :visible.sync="dialogFormVisible">
+							<el-form :model="orderForm">
+								<el-form-item label="地址" :label-width="formLabelWidth">
+									<el-input v-model="orderForm.target"></el-input>
+								</el-form-item>
+							</el-form>
+							<div slot="footer" class="dialog-footer">
+								<el-button @click="dialogFormVisible = false">取 消</el-button>
+								<el-button type="primary" @click="handleOrder">下 单</el-button>
+							</div>
 						</el-dialog>
 					</template>
 				</el-table-column>
@@ -165,6 +164,7 @@ export default {
 				pageSizes: [10, 20, 30, 40]
 			},
 			orderForm: {
+				itemId: '',
 				target: ''
 			}
 		}
@@ -263,8 +263,7 @@ export default {
 		},
 		handleOrder() {
 			this.dialogFormVisible = false
-			this.dialogVisible = false
-			let itemId = this.itemDetails.id
+			let itemId = this.orderForm.itemId
 			let target = this.orderForm.target
 			this.orderForm.target = ''
 			axios({
@@ -287,6 +286,10 @@ export default {
 					this.$message.error(res.data.msg);
 				}
 			});
+		},
+		handlePreOrder(row) {
+			this.orderForm.itemId = row.id
+			this.dialogFormVisible = true
 		}
 	}
 }

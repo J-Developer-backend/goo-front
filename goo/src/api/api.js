@@ -40,9 +40,9 @@ export function payOrder(orderId) {
  * @param {string} status - 订单状态，可选参数
  * @returns {Promise} - 返回包含订单列表的 Promise
  */
-export function getAllOrders(status) {
+export function getAllOrders(page, status) {
     const url = `${HOST}/orders`;
-    return axios.get(url, { params: { status } });
+    return axios.get(url, { params: { page, status } });
 }
 
 /**

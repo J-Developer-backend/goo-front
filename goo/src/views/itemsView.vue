@@ -90,7 +90,6 @@
 					<template slot-scope="scope">
 						<el-button size="mini" type="success" @click="handleDetail(scope.row)" style="width: 100;">详 情</el-button>
 						<el-button size="mini" @click="handlePreOrder(scope.row)" type="primary">下 单</el-button>
-						<el-button size="mini" type="warning" @click="handleComment(scope.row)">查看评论</el-button>
 						<el-button size="mini" type="danger" @click="handleLike(scope.row)">收 藏</el-button>
 						<el-dialog title="商品详情" :visible.sync="dialogVisible" width="30%" center>
 							<span>
@@ -111,6 +110,7 @@
 									</el-descriptions-item>
 								</el-descriptions>
 							</span>
+							<div v-for="comment in comments" :key="comment">({{ comment.createTime }}) {{ comment.username }} : {{ comment.context }}</div>
 							<span slot="footer" class="dialog-footer">
 								<el-button @click="dialogVisible = false" type="primary" style="margin-left: 50px;">确 定</el-button>
 							</span>
@@ -168,7 +168,8 @@ export default {
 			orderForm: {
 				itemId: '',
 				target: ''
-			}
+			},
+			comments: []
 		}
 	},
 	// 首次分页查询
@@ -183,6 +184,10 @@ export default {
 				token: ''
 			}
 		}).then(res => {
+			if (res.data.code != 200) {
+				this.$message.error("无法获取商品：" + res.data.msg);
+				return;
+			}
 			this.itemData = res.data.data.record
 			this.pageData.total = res.data.data.total
 		});
@@ -194,6 +199,9 @@ export default {
 				token: ''
 			}
 		}).then(res => {
+			if (res.data.code != 200) {
+				return;
+			}
 			this.categoryNames = res.data.data
 		});
 	},
@@ -211,6 +219,19 @@ export default {
 			}).then(res => {
 				this.itemDetails = res.data.data
 				this.dialogVisible = true
+			});
+			axios({
+				method: 'get',
+				url: '/api/comment/getByItemId?itemId=' + row.id,
+				headers: {
+					token: ''
+				}
+			}).then(res => {
+				if (res.data.code === 200) {
+					this.comments = res.data.data
+				} else {
+					this.$message.error(res.data.msg);
+				}
 			});
 		},
 		handleSizeChange(val) {

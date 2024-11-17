@@ -22,6 +22,7 @@ const routes = [
         name: 'personalProfile',
         component: () => import('@/views/personalProfile.vue'),
       },
+      {
         path: '/home/items',
         component: () => import("@/views/itemsView.vue")
       },

@@ -213,7 +213,7 @@ export default {
             }
             let url = '/api/item?ids='
             this.multipleSelection.forEach(row => {
-                url = url + (row.id + 100) + ','
+                url = url + row.id + ','
             })
             url = url + '-1'
             axios({
@@ -336,7 +336,6 @@ export default {
         },
 
         handleUpdateItem() {
-            console.log(this.updateItem)
             let url = '/api/item/update'
             axios({
                 method: 'put',

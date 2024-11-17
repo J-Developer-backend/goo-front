@@ -11,7 +11,7 @@
       </template>
     </div>
     <div class="project-name">
-      <span>Project Name</span>
+      <h1>G O O </h1>
     </div>
   </div>
 </template>

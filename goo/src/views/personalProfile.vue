@@ -20,7 +20,7 @@
       <el-form-item label="头像">
         <el-upload class="avatar-uploader" action="/api//upload" :show-file-list="false"
           :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :disabled="!isEditMode">
-          <img v-if="imageUrl" :src="imageUrl" class="avatar">
+          <img v-if="imageUrl" :src="imageUrl" class="avatar" style="width: 300px; height: 200px">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
       </el-form-item>

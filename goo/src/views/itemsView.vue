@@ -88,7 +88,7 @@
 				</el-table-column>
 				<el-table-column label="操作">
 					<template slot-scope="scope">
-						<el-button size="mini" type="success" @click="handleDetail(scope.row)">详 情</el-button>
+						<el-button size="mini" type="success" @click="handleDetail(scope.row)" style="width: 100;">详 情</el-button>
 						<el-button size="mini" @click="handlePreOrder(scope.row)" type="primary">下 单</el-button>
 						<el-button size="mini" type="warning" @click="handleComment(scope.row)">查看评论</el-button>
 						<el-button size="mini" type="danger" @click="handleLike(scope.row)">收 藏</el-button>

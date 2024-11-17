@@ -2,6 +2,22 @@ import axios from 'axios'
 export const HOST = '/api'
 
 export const ERR_OK = 200;
+// Get all chatted users
+export function getChattedUsers() {
+    return axios.get(`${HOST}/message/getChattedUsers`);
+}
+
+// Get all messages between users
+export function getAllMessages(receiveId) {
+    return axios.get(`${HOST}/message/getAllMessage`, {
+        params: { receiveId },
+    });
+}
+
+// 发送新消息
+export function sendMessage(data) {
+    return axios.post(`${HOST}/message/add`, data);
+}
 
 // 获取个人信息
 export function getUserProfile() {

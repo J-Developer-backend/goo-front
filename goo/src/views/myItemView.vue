@@ -181,6 +181,10 @@ export default {
                 token: ''
             }
         }).then(res => {
+            if (res.data.code != 200) {
+				this.$message.error("无法获取数据：" + res.data.msg);
+				return;
+			}
             this.itemData = res.data.data
         })
     },

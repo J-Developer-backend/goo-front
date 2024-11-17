@@ -89,7 +89,9 @@
 				<el-table-column label="操作">
 					<template slot-scope="scope">
 						<el-button size="mini" type="success" @click="handleDetail(scope.row)">详 情</el-button>
-						<el-button size="mini" @click="handlePreOrder(scope.row)" type="danger">下 单</el-button>
+						<el-button size="mini" @click="handlePreOrder(scope.row)" type="primary">下 单</el-button>
+						<el-button size="mini" type="warning" @click="handleComment(scope.row)">查看评论</el-button>
+						<el-button size="mini" type="danger" @click="handleLike(scope.row)">收 藏</el-button>
 						<el-dialog title="商品详情" :visible.sync="dialogVisible" width="30%" center>
 							<span>
 								<el-descriptions title="商品信息">
@@ -290,6 +292,28 @@ export default {
 		handlePreOrder(row) {
 			this.orderForm.itemId = row.id
 			this.dialogFormVisible = true
+		},
+		handleLike(row) {
+			let itemId = row.id
+			axios({
+				method: 'post',
+				url: '/api/favorite',
+				data: {
+					'itemId': itemId
+				},
+				headers: {
+					token: ''
+				}
+			}).then(res => {
+				if (res.data.code === 200) {
+					this.$message({
+						message: res.data.msg,
+						type: 'success'
+					});
+				} else {
+					this.$message.error(res.data.msg);
+				}
+			});
 		}
 	}
 }

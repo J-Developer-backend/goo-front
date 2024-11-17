@@ -18,14 +18,19 @@
         </el-select>
       </el-form-item>
       <el-form-item label="头像">
-        <el-input v-model="userInfo.avatar" :disabled="!isEditMode" placeholder="请输入头像 URL" />
+        <el-upload class="avatar-uploader" action="/api//upload" :show-file-list="false"
+          :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :disabled="!isEditMode">
+          <img v-if="imageUrl" :src="imageUrl" class="avatar">
+          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        </el-upload>
       </el-form-item>
       <el-form-item label="创建时间">
         <el-input v-model="formattedCreateTime" disabled />
       </el-form-item>
       <el-form-item>
+        <el-button type="danger" @click="handleCancel" v-if="isEditMode">取消</el-button>
         <el-button type="primary" @click="toggleEditMode">{{ isEditMode ? '保存' : '修改资料' }}</el-button>
-        <el-button type="danger" @click="openResetPasswordDialog">修改密码</el-button>
+        <el-button type="danger" @click="openResetPasswordDialog" v-if="!isEditMode">修改密码</el-button>
       </el-form-item>
     </el-form>
 
@@ -52,6 +57,7 @@ import { getUserProfile, resetPassword, update } from "@/api/api";
 export default {
   data() {
     return {
+      imageUrl: '',
       userInfo: {
         id: "",
         username: "",
@@ -81,7 +87,13 @@ export default {
         const response = await getUserProfile();
         if (response.data.code === 200) {
           this.userInfo = response.data.data;
-          this.originalUserInfo = {...response.data.data}; // Save the original data
+          if (response.data.data.sex === 1) {
+            this.userInfo.sex = '男'
+          } else {
+            this.userInfo.sex = '女'
+          }
+          this.imageUrl = this.userInfo.avatar
+          this.originalUserInfo = { ...response.data.data }; // Save the original data
           this.formattedCreateTime = this.formatDate(this.userInfo.creatTime);
         } else {
           this.$message.error("获取个人资料失败：" + response.data.msg);
@@ -114,12 +126,12 @@ export default {
 
         try {
           const response = await update(
-              payload.avatar || null,
-              payload.creatTime || null,
-              payload.email || null,
-              payload.phoneNumber || null,
-              payload.sex || null,
-              payload.username || null
+            payload.avatar || null,
+            payload.creatTime || null,
+            payload.email || null,
+            payload.phoneNumber || null,
+            payload.sex || null,
+            payload.username || null
           );
           if (response.data.code === 200) {
             this.$message.success("资料更新成功！");
@@ -145,7 +157,7 @@ export default {
         if (response.data.code === 200) {
           this.$message.success("密码修改成功！");
           this.resetPasswordDialogVisible = false;
-          this.passwordForm = {originPassword: "", newPassword: ""};
+          this.passwordForm = { originPassword: "", newPassword: "" };
         } else {
           this.$message.error("密码修改失败：" + response.data.msg);
         }
@@ -154,6 +166,26 @@ export default {
         this.$message.error("修改密码时出现错误，请稍后重试！");
       }
     },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === 'image/jpeg';
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!');
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!');
+      }
+      return isJPG && isLt2M;
+    },
+    handleAvatarSuccess(res, file) {
+      this.imageUrl = URL.createObjectURL(file.raw);
+      this.userInfo.avatar = res.data
+    },
+    handleCancel() {
+      this.isEditMode = false
+      this.fetchUserProfile();
+    }
   },
 };
 </script>
@@ -172,5 +204,32 @@ export default {
 
 .dialog-footer {
   text-align: right;
+}
+
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: #409EFF;
+}
+
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
 }
 </style>

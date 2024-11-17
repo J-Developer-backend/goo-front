@@ -6,7 +6,7 @@
 			<el-aside width="200px">
 				<el-row class="tac">
 					<el-col :span="12">
-						<el-menu router default-active="1" class="el-menu-vertical-demo, el-menu-item" 
+						<el-menu router default-active="1" class="el-menu-vertical-demo, el-menu-item"
 						background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
 							<el-menu-item index="/home/items">
 								<i class="el-icon-menu"></i>
@@ -24,14 +24,14 @@
 								<i class="el-icon-menu"></i>
 								<span slot="title">我的消息</span>
 							</el-menu-item>
-							<el-menu-item index="details">
+							<el-menu-item index="personalProfile">
 								<i class="el-icon-menu"></i>
 								<span slot="title">我的资料</span>
 							</el-menu-item>
 							<el-menu-item index="/home/like">
 								<i class="el-icon-menu"></i>
 								<span slot="title">我的收藏</span>
-							</el-menu-item>						
+							</el-menu-item>
 						</el-menu>
 					</el-col>
 				</el-row>

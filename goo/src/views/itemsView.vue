@@ -141,6 +141,7 @@
 <script>
 
 import axios from 'axios'
+import { getItems } from '@/api/api'
 
 export default {
 

@@ -18,6 +18,10 @@ const routes = [
     redirect: '/home/welcome',
     children: [
       {
+        path: '/home/personalProfile',
+        name: 'personalProfile',
+        component: () => import('@/views/personalProfile.vue'),
+      },
         path: '/home/items',
         component: () => import("@/views/itemsView.vue")
       },

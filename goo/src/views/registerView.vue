@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import {register} from "@/api/api"; // 假设已经封装了注册 API
+import { register } from "@/api/api"; // 假设已经封装了注册 API
 
 export default {
   data() {
@@ -37,7 +37,10 @@ export default {
         this.$message.error("用户名和密码不能为空！");
         return;
       }
-
+      if (this.form.username.includes(" ") || this.form.password.includes(" ")) {
+        this.$message.error("用户名和密码不能有空格！");
+        return;
+      }
       try {
         // 调用注册接口
         const response = await register(this.form.username, this.form.password);

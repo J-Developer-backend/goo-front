@@ -76,7 +76,7 @@
 				</el-table-column>
 				<el-table-column label="价格" width="180">
 					<template slot-scope="scope">
-						<span style="margin-left: 10px">{{ scope.row.price }}</span>
+						<span style="margin-left: 10px">￥{{ scope.row.price }}</span>
 					</template>
 				</el-table-column>
 				<el-table-column label="分类" width="180">
@@ -96,7 +96,7 @@
 							<span>
 								<el-descriptions title="商品信息">
 									<el-descriptions-item label="商品名称">{{ itemDetails.name }}</el-descriptions-item>
-									<el-descriptions-item label="价格">{{ itemDetails.price }}</el-descriptions-item>
+									<el-descriptions-item label="价格">￥{{ itemDetails.price }}</el-descriptions-item>
 									<el-descriptions-item label="分类">
 										<el-tag size="small">{{ itemDetails.categoryName }}</el-tag>
 									</el-descriptions-item>
@@ -112,7 +112,7 @@
 								</el-descriptions>
 							</span>
 							<div v-for="comment in comments" :key="comment">({{ comment.createTime }}) {{
-								comment.username }} : {{
+								comment.userName }} : {{
 									comment.context }}</div>
 							<span slot="footer" class="dialog-footer">
 								<el-button @click="dialogVisible = false" type="primary" style="margin-left: 50px;">确
@@ -293,6 +293,10 @@ export default {
 			this.searchData.maxPrice = ''
 		},
 		handleOrder() {
+			if (!this.orderForm.target) {
+				this.$message.error("收货地址不能为空！")
+				return
+			}
 			this.dialogFormVisible = false
 			let itemId = this.orderForm.itemId
 			let target = this.orderForm.target

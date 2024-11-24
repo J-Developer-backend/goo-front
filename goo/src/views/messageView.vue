@@ -1,267 +1,121 @@
 <template>
-  <div class="chat-app">
-    <!-- Left Panel: Chat List -->
-    <div class="chat-list">
-      <el-input v-model="searchQuery" placeholder="搜索" class="search-bar"></el-input>
-      <el-scrollbar class="chat-list-scroll">
-        <el-menu :default-active="activeChatId" @select="handleChatSelect">
-          <el-menu-item
-              v-for="chat in filteredChats"
-              :key="chat.id"
-              :index="chat.id.toString()"
-              class="chat-item"
-          >
-            <div class="chat-avatar">
-              <img :src="chat.avatar || defaultAvatar" alt="Avatar" />
-            </div>
-            <div class="chat-info">
-              <div class="chat-name">{{ chat.username }}</div>
-              <div class="chat-last-message">{{ chat.lastMessage || "暂无消息" }}</div>
-            </div>
-          </el-menu-item>
-        </el-menu>
-      </el-scrollbar>
-    </div>
+  <div class="chat-container">
+    <!-- 聊天对象下拉菜单 -->
+    <el-select v-model="selectedUser" placeholder="选择聊天对象" class="chat-select" style="width: 40%;"
+    @change="handleSelectUser">
+      <el-option v-for="user in users" :key="user.id" :label="user.username" :value="user.id">
+      </el-option>
+    </el-select>
 
-    <!-- Right Panel: Chat Content -->
-    <div class="chat-content">
-      <div v-if="activeChatId">
-        <!-- Chat Header -->
-        <div class="chat-header">
-          <div class="chat-title">{{ activeChat?.username }}</div>
-        </div>
-
-        <!-- Chat Messages -->
-        <el-scrollbar class="chat-messages">
-          <div
-              v-for="message in messages"
-              :key="message.id"
-              :class="['message', message.sendId === userId ? 'message-right' : 'message-left']"
-          >
-            <img
-                class="message-avatar"
-                :src="message.sendId === userId ? userAvatar : activeChat.avatar"
-                alt="Avatar"
-            />
-            <div class="message-content">
-              <div class="message-username">
-                {{ message.sendId === userId ? "我" : activeChat.username }}
-              </div>
-              <div class="message-text">{{ message.context }}</div>
-            </div>
-          </div>
-        </el-scrollbar>
-
-        <!-- Chat Input -->
-        <div class="chat-input">
-          <el-input
-              v-model="newMessage"
-              placeholder="输入消息..."
-              @keyup.enter="sendMessageHandler"
-          ></el-input>
-          <el-button type="primary" @click="sendMessageHandler">发送</el-button>
+    <!-- 聊天内容区域 -->
+    <div class="chat-content" ref="chatContent">
+      <div v-for="message in messages" :key="message.id" class="message">
+        <div :class="{ 'my-message': message.self, 'other-message': !message.self }">
+          {{ message.content }}
         </div>
       </div>
-      <div v-else class="no-chat-selected">请选择一个聊天开始对话</div>
     </div>
+
+    <!-- 聊天输入区域 -->
+    <el-input type="textarea" v-model="inputMessage" placeholder="请输入消息" @keyup.enter.native="sendMessage">
+    </el-input>
+    <el-button type="primary" @click="sendMessage">发送</el-button>
   </div>
 </template>
 
 <script>
-import { getChattedUsers, getAllMessages, sendMessage } from "@/api/api";
-import {mapState} from "vuex";
-
+import axios from 'axios'
 export default {
   data() {
     return {
-      userAvatar: "path_to_user_avatar", // Avatar for the current user
-      defaultAvatar: "path_to_default_avatar", // Fallback avatar for users
-      chats: [], // All chatted users
-      messages: [], // Chat messages for the active chat
-      activeChatId: null, // Currently active chat ID
-      searchQuery: "", // Search query
-      newMessage: "", // New message text
+      selectedUser: '',
+      users: [],
+      messages: [],
+      inputMessage: '',
     };
   },
-  computed: {
-    ...mapState({
-      userId: state => state.userId
-    }),
-    activeChat() {
-      return this.chats.find((chat) => chat.id === this.activeChatId) || null;
-    },
-    filteredChats() {
-      if (this.searchQuery) {
-        return this.chats.filter((chat) =>
-            chat.username.includes(this.searchQuery)
-        );
-      }
-      return this.chats;
-    },
-  },
   mounted() {
-    console.log(this.userId);
-    this.fetchChattedUsers();
+    let url = '/api//message/getChattedUsers'
+    axios({
+      method: 'get',
+      url: url,
+      headers: {
+        token: ''
+      }
+    }).then(res => {
+      this.users = res.data.data
+      //this.users = [{username: "name1", id: 1}, {username: "name2", id: 2}]
+    });
   },
   methods: {
-    async fetchChattedUsers() {
-      try {
-        const response = await getChattedUsers();
-        if (response.data.code === 200) {
-          this.chats = response.data.data;
-        } else {
-          this.$message.error("获取聊天用户列表失败");
-        }
-      } catch (error) {
-        console.error("获取聊天用户列表失败", error);
-        this.$message.error("网络错误，请稍后重试");
-      }
+    sendMessage() {
+      if (this.inputMessage.trim() === '') return;
+      const newMessage = {
+        id: this.messages.length + 1,
+        content: this.inputMessage,
+        self: true, // 假设所有消息都是自己发送的
+      };
+      this.messages.push(newMessage);
+      this.inputMessage = ''; // 清空输入框
+      this.$nextTick(() => {
+        this.$refs.chatContent.scrollTop = this.$refs.chatContent.scrollHeight;
+      });
     },
-    async fetchMessages(receivedId) {
-      try {
-        const response = await getAllMessages(receivedId);
-        if (response.data.code === 200) {
-          this.messages = response.data.data;
-        } else {
-          this.$message.error("获取聊天记录失败");
-        }
-      } catch (error) {
-        console.error("获取聊天记录失败", error);
-        this.$message.error("网络错误，请稍后重试");
-      }
-    },
-    handleChatSelect(chatId) {
-      this.activeChatId = parseInt(chatId);
-      this.fetchMessages(this.activeChatId);
-    },
-
-
-    async sendMessageHandler() {
-      if (!this.newMessage.trim()) {
-        this.$message.warning("消息不能为空");
-        return;
-      }
-      try {
-        const data = {
-          context: this.newMessage,
-          receiveId: this.activeChatId, // 修改为 receiveId
-        };
-        const response = await sendMessage(data);
-        if (response.data.code === 200) {
-          this.messages.push({
-            id: Date.now(),
-            context: this.newMessage,
-            sendId: this.userId,
-            receiveId: this.activeChatId,
-            avatar: this.userAvatar,
-          });
-          this.newMessage = "";
-        } else {
-          this.$message.error("发送消息失败");
-        }
-      } catch (error) {
-        console.error("发送消息失败", error);
-        this.$message.error("网络错误，请稍后重试");
-      }
+    handleSelectUser() {
+      alert(this.selectedUser)
     }
   },
 };
 </script>
 
 <style scoped>
-.chat-app {
-  display: flex;
-  height: 100vh;
-  background: #f5f5f5;
-}
-.chat-list {
-  width: 300px;
-  border-right: 1px solid #ddd;
-  background: #fff;
-}
-.chat-list-scroll {
-  height: calc(100% - 50px);
-}
-.search-bar {
-  margin: 10px;
-}
-.chat-item {
-  display: flex;
-  padding: 10px;
-  cursor: pointer;
-}
-.chat-avatar img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-.chat-info {
-  margin-left: 10px;
-}
-.chat-name {
-  font-weight: bold;
-}
-.chat-last-message {
-  font-size: 12px;
-  color: #666;
-}
-.chat-content {
-  flex: 1;
+.chat-container {
   display: flex;
   flex-direction: column;
-  background: #f8f8f8;
+  height: 100vh;
 }
-.chat-header {
-  padding: 10px;
-  background: #fff;
-  border-bottom: 1px solid #ddd;
+
+.chat-select {
+  margin: 10px;
 }
-.chat-messages {
+
+.chat-content {
   flex: 1;
-  padding: 10px;
   overflow-y: auto;
-  background: #f9f9f9;
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid #ebeef5;
+  width: 80%;
+  height: 10vb;
 }
+
 .message {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
-.message-left {
-  flex-direction: row;
-}
-.message-right {
-  flex-direction: row-reverse;
-}
-.message-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-.message-content {
-  max-width: 60%;
-  padding: 10px;
-  margin: 0 10px;
-  background: #fff;
+
+.my-message {
+  background-color: #0ef428;
   border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-.message-username {
-  font-size: 12px;
-  color: #666;
-  margin-bottom: 5px;
-}
-.message-text {
-  font-size: 14px;
-}
-.chat-input {
-  display: flex;
   padding: 10px;
-  background: #fff;
-  border-top: 1px solid #ddd;
+  max-width: 40%;
+  margin-left: auto;
+  word-wrap: break-word;
+  /* 允许长单词换行 */
+  ;
+  text-align: right;
+  width: fit-content;
 }
-.chat-input input {
-  flex: 1;
-  margin-right: 10px;
+
+.other-message {
+  background-color: #0ab6f0;
+  border-radius: 5px;
+  padding: 10px;
+  max-width: 40%;
+  margin-right: auto;
+  word-wrap: break-word;
+  /* 允许长单词换行 */
+  ;
+  text-align: left;
+  width: fit-content;
 }
 </style>

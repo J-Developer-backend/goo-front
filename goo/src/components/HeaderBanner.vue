@@ -63,7 +63,7 @@ export default {
       this.avatar = '';
 
       // 提示信息
-      this.$message.success('You have successfully logged out.');
+      this.$message.success('登出成功！');
 
       // 跳转到首页并避免重复导航
       if (this.$route.path !== '/') {

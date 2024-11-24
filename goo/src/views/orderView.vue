@@ -252,6 +252,10 @@ export default {
       this.dialogCommentVisible = false
     },
     handleAddComment() {
+      if (!this.comment.context) {
+        this.$message.error("评论不能为空")
+        return
+      }
       let url = '/api/comment/add'
       axios({
         method: 'post',

@@ -119,7 +119,7 @@
                                 <el-form-item label="商品图片" class="input-box">
                                     <el-upload class="avatar-uploader" action="/api//upload" :show-file-list="false"
                                         :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
-                                        <img v-if="updateItem.image" :src="updateItem.image" alt="">
+                                        <img v-if="updateItem.image" :src="updateItem.image" alt="" style="width: 90%;">
                                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                                     </el-upload>
                                 </el-form-item>
@@ -265,6 +265,19 @@ export default {
 
         handleAddItem() {
             let url = '/api/item'
+            if (!this.addItem.name || 
+            !this.addItem.categoryId ||
+            !this.addItem.description ||
+            !this.addItem.image ||
+            !this.addItem.location ||
+            !this.addItem.price) {
+                this.$message.error("商品信息不能有空值！")
+                return
+            }
+            if (parseFloat(this.addItem.price) <= 0.0) {
+                this.$message.error("商品价格不合理")
+                return
+            }
             axios({
                 method: 'post',
                 url: url,
@@ -340,6 +353,19 @@ export default {
         },
 
         handleUpdateItem() {
+            if (!this.updateItem.name || 
+            !this.updateItem.categoryId ||
+            !this.updateItem.description ||
+            !this.updateItem.image ||
+            !this.updateItem.location ||
+            !this.updateItem.price) {
+                this.$message.error("商品信息不能有空值！")
+                return
+            }
+            if (parseFloat(this.updateItem.price) <= 0.0) {
+                this.$message.error("商品价格不合理")
+                return
+            }
             let url = '/api/item/update'
             axios({
                 method: 'put',

@@ -92,6 +92,7 @@
 							情</el-button>
 						<el-button size="mini" @click="handlePreOrder(scope.row)" type="primary">下 单</el-button>
 						<el-button size="mini" type="danger" @click="handleLike(scope.row)">收 藏</el-button>
+						<el-button size="mini" type="danger" @click="handleChat(scope.row)">联 系</el-button>
 						<el-dialog title="商品详情" :visible.sync="dialogVisible" width="30%" center>
 							<span>
 								<el-descriptions title="商品信息">
@@ -130,6 +131,17 @@
 								<el-button type="primary" @click="handleOrder">下 单</el-button>
 							</div>
 						</el-dialog>
+						<el-dialog title="与卖家联系" :visible.sync="dialogChatVisible">
+							<el-form :model="chatForm">
+								<el-form-item label="消息" :label-width="formLabelWidth">
+									<el-input v-model="chatForm.context"></el-input>
+								</el-form-item>
+							</el-form>
+							<div slot="footer" class="dialog-footer">
+								<el-button @click="dialogChatVisible = false">取 消</el-button>
+								<el-button type="primary" @click="handleSend">发 送</el-button>
+							</div>
+						</el-dialog>
 					</template>
 				</el-table-column>
 			</el-table>
@@ -163,6 +175,7 @@ export default {
 			itemDetails: {},
 			dialogVisible: false,
 			dialogFormVisible: false,
+			dialogChatVisible: false,
 			pageData: {
 				total: 0,
 				page: 1,
@@ -172,6 +185,10 @@ export default {
 			orderForm: {
 				itemId: '',
 				target: ''
+			},
+			chatForm: {
+				context: '',
+				receiveId: ''
 			},
 			comments: []
 		}
@@ -347,6 +364,29 @@ export default {
 					this.$message.error(res.data.msg);
 				}
 			});
+		},
+		handleChat(row) {
+			this.dialogChatVisible = true
+			this.chatForm.receiveId = row.userId
+		},
+		handleSend() {
+			if (!this.chatForm.context) {
+				this.$message.error("消息不能为空！")
+				return
+			}
+			let url = "/api/message/add"
+			axios({
+				method: 'post',
+				url: url,
+				headers: {
+					token: ''
+				},
+				data: this.chatForm
+			}).then(res => {
+				this.$message.success(res.data.msg)
+				this.chatForm.context = ''
+				this.dialogChatVisible = false
+			})
 		}
 	}
 }

@@ -2,7 +2,7 @@
   <div class="chat-container">
     <!-- 聊天对象下拉菜单 -->
     <el-select v-model="selectedUser" placeholder="选择聊天对象" class="chat-select" style="width: 40%;"
-    @change="handleSelectUser">
+      @change="handleSelectUser">
       <el-option v-for="user in users" :key="user.id" :label="user.username" :value="user.id">
       </el-option>
     </el-select>
@@ -49,20 +49,62 @@ export default {
   },
   methods: {
     sendMessage() {
-      if (this.inputMessage.trim() === '') return;
+      if (!this.selectedUser) {
+        this.$message.error("必须选择一个用户进行交流！")
+        return
+      }
+      if (this.inputMessage.trim() === '') {
+        this.$message.error("消息不能为空！")
+        return
+      }
       const newMessage = {
-        id: this.messages.length + 1,
         content: this.inputMessage,
         self: true, // 假设所有消息都是自己发送的
       };
       this.messages.push(newMessage);
-      this.inputMessage = ''; // 清空输入框
       this.$nextTick(() => {
         this.$refs.chatContent.scrollTop = this.$refs.chatContent.scrollHeight;
       });
+      let url = "/api/message/add"
+      axios({
+        method: 'post',
+        url: url,
+        headers: {
+          token: ''
+        },
+        data: {
+          "context": this.inputMessage,
+          "receiveId": this.selectedUser
+        }
+      }).then(res => {
+        this.$message.success(res.data.msg)
+        this.inputMessage = ''
+      })
     },
     handleSelectUser() {
-      alert(this.selectedUser)
+      let url = "/api/message/getAllMessage?receiveId=" + this.selectedUser
+      let otherUser = ""
+      this.users.forEach(user => {
+        if (user.id === this.selectedUser) {
+          otherUser = user.username
+        }
+      })
+      axios({
+        method: 'get',
+        url: url,
+        headers: {
+          token: ''
+        }
+      }).then(res => {
+        let data = res.data.data
+        data.forEach(m => {
+          const message = {
+            content: m.context,
+            self: m.receiveUserName === otherUser
+          }
+          this.messages.push(message)
+        });
+      });
     }
   },
 };
